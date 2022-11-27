@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="SearchResultCell" id="hkM-I7-OLW" customClass="SearchResultCell" customModule="StretchyTableViewHeader" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="80"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="hkM-I7-OLW" id="bX8-N4-6m8">
+                <rect key="frame" x="0.0" y="0.0" width="375" height="80"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="751" text="FoodName" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wcm-ed-cJY">
+                        <rect key="frame" x="30" y="16" width="329" height="22"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="FoodFacts" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xiW-cq-mn4">
+                        <rect key="frame" x="30" y="46" width="329" height="18"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="xiW-cq-mn4" firstAttribute="leading" secondItem="bX8-N4-6m8" secondAttribute="leading" constant="30" id="8tD-Nl-adL"/>
+                    <constraint firstAttribute="trailing" secondItem="Wcm-ed-cJY" secondAttribute="trailing" constant="16" id="9RD-TD-igl"/>
+                    <constraint firstItem="Wcm-ed-cJY" firstAttribute="top" secondItem="bX8-N4-6m8" secondAttribute="top" constant="16" id="ACx-3Q-drt"/>
+                    <constraint firstItem="xiW-cq-mn4" firstAttribute="top" secondItem="Wcm-ed-cJY" secondAttribute="bottom" constant="8" id="WLM-a4-MDS"/>
+                    <constraint firstAttribute="trailing" secondItem="xiW-cq-mn4" secondAttribute="trailing" constant="16" id="XY0-90-7Zo"/>
+                    <constraint firstAttribute="bottom" secondItem="xiW-cq-mn4" secondAttribute="bottom" constant="16" id="unw-qP-29r"/>
+                    <constraint firstItem="Wcm-ed-cJY" firstAttribute="leading" secondItem="bX8-N4-6m8" secondAttribute="leading" constant="30" id="yhb-4f-JJg"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="foodMacros" destination="xiW-cq-mn4" id="JDr-ma-9MN"/>
+                <outlet property="foodname" destination="Wcm-ed-cJY" id="Qrc-OG-PmU"/>
+            </connections>
+            <point key="canvasLocation" x="177.86259541984731" y="-71.126760563380287"/>
+        </tableViewCell>
+    </objects>
+</document>
