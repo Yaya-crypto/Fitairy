@@ -34,31 +34,13 @@ class DiaryTableViewController: UITableViewController {
         
         fetchedResultsController.delegate = self
         return fetchedResultsController
-        
-        
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-     //   tableView.reloadData()
         performFetch()
-        
-//        let fetchRequest = NSFetchRequest<DiaryEntry>()
-//
-//        let entity = DiaryEntry.entity()
-//        fetchRequest.entity = entity
-//
-//        let sortDescriptor = NSSortDescriptor(
-//        key: "nf_calories", ascending: false)
-//        fetchRequest.sortDescriptors = [sortDescriptor]
-//
-//        do {
-//            coreDataEntries = try managedObjectContext.fetch(fetchRequest)
-//        } catch {
-//            fatalError("Error \(error)")
-//        }
-
     }
+    
     
     // MARK: Table View Delegates
     
@@ -66,14 +48,11 @@ class DiaryTableViewController: UITableViewController {
       _ tableView: UITableView,
       cellForRowAt indexPath: IndexPath) -> UITableViewCell {
           
-      let cell = tableView.dequeueReusableCell(
-        withIdentifier: "FoodEntry",
-        for: indexPath)
+      let cell = tableView.dequeueReusableCell(withIdentifier: "FoodEntry", for: indexPath)
 
-      // let item = coreDataEntries[indexPath.row]
-          let item = fetchedResultsController.object(at: indexPath)
+      let item = fetchedResultsController.object(at: indexPath)
           
-        configureText(for: cell, with: item)
+      configureText(for: cell, with: item)
 
       
       return cell
@@ -88,11 +67,10 @@ class DiaryTableViewController: UITableViewController {
     override func tableView(
         _ tableView: UITableView,
         numberOfRowsInSection section: Int) -> Int {
-            
-            let sections = fetchedResultsController.sections![section]
-            return sections.numberOfObjects
         
-       // return coreDataEntries.count
+        let sections = fetchedResultsController.sections![section]
+        return sections.numberOfObjects
+
     }
     
     /*
@@ -109,13 +87,8 @@ class DiaryTableViewController: UITableViewController {
     override func tableView(
       _ tableView: UITableView,
       commit editingStyle: UITableViewCell.EditingStyle,
-      forRowAt indexPath: IndexPath
-    ) {
-      // 1
-        
-        //entries.remove(at: indexPath.row)
-        // coreDataEntries.remove(at: indexPath.row)
-        
+      forRowAt indexPath: IndexPath) {
+          
         if editingStyle == .delete {
             let entry = fetchedResultsController.object(at: indexPath)
             managedObjectContext.delete(entry)
@@ -125,26 +98,13 @@ class DiaryTableViewController: UITableViewController {
                 fatalError("Error doing something idk \(error)")
             }
         }
-
-      // 2
-//      let indexPaths = [indexPath]
-//      tableView.deleteRows(at: indexPaths, with: .automatic)
     }
     
     override func tableView(
       _ tableView: UITableView,
-      didSelectRowAt indexPath: IndexPath
-    ) {
-//      if let cell = tableView.cellForRow(at: indexPath) {
-//        let item = coreDataEntries[indexPath.row]
-//
-//      }
-
+      didSelectRowAt indexPath: IndexPath) {
       tableView.deselectRow(at: indexPath, animated: true)
     }
-    
-    
-
 
     
     /*
@@ -167,20 +127,15 @@ class DiaryTableViewController: UITableViewController {
             
             let controller = segue.destination as! EntryDetailViewController
             if let indexPath = tableView.indexPath(for: sender as! UITableViewCell) {
-             //   let foodDetail = coreDataEntries[indexPath.row]
                 let foodDetail = fetchedResultsController.object(at: indexPath)
                 controller.diaryEntry = foodDetail
-                
-             //  controller.managedObjectContext = managedObjectContext
+
             }
         }
         if segue.identifier == "searchFood" {
             let controller = segue.destination as! SearchViewController
             controller.managedObjectContext = managedObjectContext
         }
-        
-        guard let searchViewController = segue.destination as? SearchViewController else { return }
-        searchViewController.delegate = self
 
     }
     
@@ -208,22 +163,6 @@ class DiaryTableViewController: UITableViewController {
 }
 
 
-
-
-/*
- SearchViewControllerDelegate protocol.
- */
-extension DiaryTableViewController: SeachViewControllerDelegate {
-    func save(_ foodEntry: DiaryEntry) {
-        
-//        let newRowIndex = coreDataEntries.count
-//        coreDataEntries.append(foodEntry)
-//        let indexPath = IndexPath(row: newRowIndex, section: 0)
-//        let indexPaths = [indexPath]
-//        tableView.insertRows(at: indexPaths, with: .automatic)
-    }
-}
-
 extension DiaryTableViewController: NSFetchedResultsControllerDelegate {
     
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
@@ -231,8 +170,6 @@ extension DiaryTableViewController: NSFetchedResultsControllerDelegate {
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        
-        print("*** controllerDidChangeContent")
         tableView.endUpdates()
     }
     
@@ -246,12 +183,12 @@ extension DiaryTableViewController: NSFetchedResultsControllerDelegate {
             tableView.deleteRows(at: [indexPath!], with: .fade)
             
         case .move:
-            print("Nothing to move")
+            fallthrough
         case .update:
-            print("*** NSFetchedResultsChangeUpdate (object)")
+            fallthrough
 
         @unknown default:
-            print("UNKOWN DEFAULT AHHHHHHHH")
+            break
         }
     }
     
@@ -263,21 +200,19 @@ extension DiaryTableViewController: NSFetchedResultsControllerDelegate {
             
             switch type {
             case .insert:
-                print("*** NSFetchedResultsChangeInsert (section)")
                 tableView.insertSections(IndexSet(integer: sectionIndex), with: .fade)
                 
             case .delete:
-                print("*** NSFetchedResultsChangeDelete (section)")
                 tableView.deleteSections(IndexSet(integer: sectionIndex), with: .fade)
                 
             case .update:
-                print("*** NSFetchedResultsChangeUpdate (section)")
+                fallthrough
                 
             case .move:
-                print("*** NSFetchedResultsChangeMove (section)")
+                fallthrough
                 
             @unknown default:
-                print("*** NSFetchedResults unknown type")
+                break
             }
         }
     

@@ -12,9 +12,6 @@ import CoreData
  Protocol for Delegate. DiaryTableViewController is the delegate used
  Save saves the entry to the diary list
  */
-protocol SeachViewControllerDelegate: AnyObject {
-    func save(_ foodEntry: DiaryEntry)
-}
 
 class SearchViewController: UIViewController {
 
@@ -33,7 +30,6 @@ class SearchViewController: UIViewController {
     var hasSearched = false
     var foodResult = FoodEntry(foods: [])
     var dataTask: URLSessionDataTask?
-    weak var delegate: SeachViewControllerDelegate?
     var managedObjectContext: NSManagedObjectContext!
     
     
@@ -104,10 +100,28 @@ class SearchViewController: UIViewController {
         execute: run)
     }
     
+    func convert(foodEntry food: FoodEntry.food, toDiary entry: DiaryEntry) -> DiaryEntry {
+        entry.food_name = food.food_name
+        entry.nf_calories = food.nf_calories
+        entry.nf_protein = food.nf_protein!
+        entry.nf_total_carbohydrate = food.nf_total_carbohydrate!
+        entry.nf_sugars = food.nf_sugars!
+        entry.serving_qty = Int16(food.serving_qty)
+        entry.serving_weight_grams = Int16(food.serving_weight_grams)
+        entry.nf_total_fat = food.nf_total_fat!
+        return entry
+    }
+    
+    /*
+     Unwind segue from EntryDetailViewController back to SearchResults
+     */
     @IBAction func cancel(_ unwindSegue: UIStoryboardSegue) {
         print("CANCEL CLICKEDDDDDDD")
     }
     
+    /*
+     LogFood button on EntryDetailViewControlelr
+     */
     @IBAction func saveeeee(_ unwindeSegue: UIStoryboardSegue) {
         guard let mainView = navigationController?.parent?.view else { return }
         let hudView = HudView.hud(inView: mainView, animated: true)
@@ -116,17 +130,9 @@ class SearchViewController: UIViewController {
         if let entryDetailViewController = unwindeSegue.source as? EntryDetailViewController {
             let foodEntry = entryDetailViewController.foodEntryToAdd
             if let foodEntry = foodEntry {
-               // delegate?.save(foodEntry)
-                let entry = DiaryEntry(context: managedObjectContext)
-                entry.food_name = foodEntry.food_name
-                entry.nf_calories = foodEntry.nf_calories
-                entry.nf_protein = foodEntry.nf_protein!
-                entry.nf_total_carbohydrate = foodEntry.nf_total_carbohydrate!
-                entry.nf_sugars = foodEntry.nf_sugars!
-                entry.serving_qty = Int16(foodEntry.serving_qty)
-                entry.serving_weight_grams = Int16(foodEntry.serving_weight_grams)
-                entry.nf_total_fat = foodEntry.nf_total_fat!
-                delegate?.save(entry)
+
+                var entry = DiaryEntry(context: managedObjectContext)
+                entry = convert(foodEntry: foodEntry, toDiary: entry)
                 do {
                     try managedObjectContext.save()
                     afterDelay(0.6) {
@@ -141,22 +147,24 @@ class SearchViewController: UIViewController {
     
     // MARK: - Navigation
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    // "foodItem" is the segue from Search to Entry
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
         if segue.identifier == "foodItem" {
             let controller = segue.destination as! EntryDetailViewController
             let indexPath = sender as! IndexPath
             let foodDetail = foodResult.foods[indexPath.row]
-         //   controller.delegate = self
             controller.foodEntryToAdd = foodDetail
-          //  controller.managedObjectContext = managedObjectContext
         }
     }
     
 
 }
 
+    /*
+     Required Headers
+     Body is user input (e.g "One cup on orange juice")
+     */
     func performAPI(searchText: String) -> NSMutableURLRequest {
         let headers = [
             "x-app-id": "6aed71f3",
@@ -181,8 +189,10 @@ class SearchViewController: UIViewController {
 
 extension SearchViewController: UISearchBarDelegate {
     
+    /*
+     User performs a search for a food
+     */
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        
         if !searchBar.text!.isEmpty {
           searchBar.resignFirstResponder() // remove keyboard
             dataTask?.cancel()
@@ -195,7 +205,7 @@ extension SearchViewController: UISearchBarDelegate {
             
             dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in
                 if let error = error  {
-                    print(error.localizedDescription)
+                    print("Error performing API \(error.localizedDescription)")
                     
                 } else if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
                     
@@ -205,7 +215,6 @@ extension SearchViewController: UISearchBarDelegate {
                         guard let todoItemModel = todoItem else { return }
                         
                         self.foodResult = todoItemModel
-                        print(todoItemModel)
                         DispatchQueue.main.async {
                           self.tableView.reloadData()
                         }
@@ -229,9 +238,16 @@ extension SearchViewController: UISearchBarDelegate {
         
     }
     
+    /*
+     If the user tapped the barcode icon.
+     TODO: Implement barcode scanning with another API
+     */
     func searchBarBookmarkButtonClicked(_ searchBar: UISearchBar) {
     }
     
+    /*
+     Leave searchbar on top
+     */
     func position(for bar: UIBarPositioning) -> UIBarPosition {
      return .topAttached
    }
@@ -240,11 +256,14 @@ extension SearchViewController: UISearchBarDelegate {
 
 extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     
-    
+    /*
+     If The user hasnt search, Nothing should show
+     Else if user searched and nothing was found. Result is null
+     Else show results
+     */
     func tableView(
       _ tableView: UITableView,
-      numberOfRowsInSection section: Int
-    ) -> Int {
+      numberOfRowsInSection section: Int) -> Int {
       if !hasSearched {
         return 0
       } else if foodResult.foods.count == 0 {
@@ -254,7 +273,10 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
       }
     }
     
-    
+    /*
+     Return nothing found cell if the food is not in the database
+     Else returns the cell that was searched
+     */
     func tableView(
       _ tableView: UITableView,
       cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -275,7 +297,8 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     /*
-     de selects the row a user tapped. Makes it not grey
+     De-selects the row a user tapped. Makes it not grey
+     Also performs the segue to EntryDetailViewController
      */
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
@@ -283,6 +306,9 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
         performSegue(withIdentifier: "foodItem", sender: indexPath)
     }
     
+    /*
+     I forgot what this does
+     */
     func tableView(
       _ tableView: UITableView,
       willSelectRowAt indexPath: IndexPath ) -> IndexPath? {
