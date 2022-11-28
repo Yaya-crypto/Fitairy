@@ -208,8 +208,6 @@ class DiaryTableViewController: UITableViewController {
 }
 
 
-
-
 /*
  SearchViewControllerDelegate protocol.
  */
