@@ -8,23 +8,53 @@
 import UIKit
 import CoreData
 
-class DiaryTableViewController: UITableViewController {
+class DiaryTableViewController: UITableViewController, EntryDetailViewControllerDelegate {
+    
+    // Disable done button
+    func addItemViewController<T>(_ controller: EntryDetailViewController, didFinishAdding obj: T) {
+        print("")
+    }
+    
+    
+    func addItemViewControllerDidCancel(_ controller: EntryDetailViewController) {
+        navigationController?.popViewController(animated: true)
+    }
+    
     
     var managedObjectContext: NSManagedObjectContext!
+    var caloriesConsumed = Float()
     
-    var entries = [FoodEntry.food]()
-    var coreDataEntries = [DiaryEntry]()
-    
-    
-    lazy var fetchedResultsController: NSFetchedResultsController<DiaryEntry> = {
+    lazy var fetchedResultsController: NSFetchedResultsController<DiaryEntry> = { // 12/01 ==
         let fetchRequest = NSFetchRequest<DiaryEntry>()
+
+        // Get the current calendar with local time zone
+        var calendar = Calendar.current
+        calendar.timeZone = NSTimeZone.local
         
+        var userLocale = calendar.locale // NSDATEformatter for locale timezone, store in UTC
+        
+        // Get today's beginning & end
+        let dateFrom = calendar.startOfDay(for: Date())                     // 2022-12-01 05:00:00 +0000 -5
+        let dateTo =  calendar.date(byAdding: .day, value: 1, to: dateFrom) // 2022-12-02 05:00:00 +0000 -5
+
+        // Set predicate as date being today's date
+        // If the date is greater than starting date or less than next date
+         let datePredicate = NSPredicate(format: "dateLogged >= %@ AND dateLogged <= %@", dateFrom as NSDate, dateTo! as NSDate)
+
+        
+        print("------- DATE FROM") // 2022-12-01 05:00:00 +0000
+        print(dateFrom)
+        print("------- DATE TO")   // 2022-12-02 05:00:00 +0000
+        print(dateTo!)
+                                  // 2022-12-01 17:30:53 +0000 orange
+
         let entity = DiaryEntry.entity()
         fetchRequest.entity = entity
-        
+       
         let sortDescriptor = NSSortDescriptor(key: "nf_calories", ascending: false)
         fetchRequest.sortDescriptors = [sortDescriptor]
         
+        fetchRequest.predicate = datePredicate
         
         let fetchedResultsController = NSFetchedResultsController(
           fetchRequest: fetchRequest,
@@ -51,7 +81,6 @@ class DiaryTableViewController: UITableViewController {
       let cell = tableView.dequeueReusableCell(withIdentifier: "FoodEntry", for: indexPath)
 
       let item = fetchedResultsController.object(at: indexPath)
-          
       configureText(for: cell, with: item)
 
       
@@ -100,6 +129,30 @@ class DiaryTableViewController: UITableViewController {
         }
     }
     
+//    override func tableView(
+//        _ tableView: UITableView,
+//        viewForHeaderInSection section: Int
+//    ) -> UIView? {
+//
+//        let sectionHeaderBackgroundColor = UIColor(hue: 0.021, saturation: 0.34, brightness: 0.94, alpha: 0.4)
+//        let vw = UIView()
+//        vw.frame = CGRect(x: 3, y: 10, width: 30, height: 30)
+//        vw.backgroundColor = sectionHeaderBackgroundColor
+//
+//        let calorieLabel = UILabel()
+//        calorieLabel.text = "\(UserDefaults.standard.integer(forKey: "CaloricGoal"))"
+//        calorieLabel.frame = CGRect(x: 43, y: 5, width: 250, height: 40)
+//
+//        let caloriesConsumedlabel = UILabel()
+//        calorieLabel.text = "\(caloriesConsumed)"
+//        calorieLabel.frame = CGRect(x: 63, y: 5, width: 250, height: 40)
+//
+//        vw.addSubview(calorieLabel)
+//       // vw.backgroundColor = UIColor.red
+//
+//        return vw
+//    }
+    
     override func tableView(
       _ tableView: UITableView,
       didSelectRowAt indexPath: IndexPath) {
@@ -114,11 +167,12 @@ class DiaryTableViewController: UITableViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        if !Core.shared.isNewUser() {
+        if Core.shared.isNewUser() {
             let vc = storyboard?.instantiateViewController(withIdentifier: "welcome") as! WelcomeViewController
             vc.modalPresentationStyle = .fullScreen // users can swipe down onboarding without this
             present(vc, animated: true)
         }
+     
     }
     
     // MARK: Navigation
@@ -126,9 +180,11 @@ class DiaryTableViewController: UITableViewController {
         if segue.identifier == "diaryEntryDetail" {
             
             let controller = segue.destination as! EntryDetailViewController
+            controller.delegate = self
             if let indexPath = tableView.indexPath(for: sender as! UITableViewCell) {
                 let foodDetail = fetchedResultsController.object(at: indexPath)
                 controller.diaryEntry = foodDetail
+                controller.delegate = self
 
             }
         }

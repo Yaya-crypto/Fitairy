@@ -83,7 +83,7 @@ class WelcomeViewController: UIViewController, UITextFieldDelegate {
         
         textField.keyboardType = .numberPad
         
-        doneButton.layer.cornerRadius = 10
+        doneButton.layer.cornerRadius = 10 // rounded button
     }
     
     /*
@@ -92,6 +92,7 @@ class WelcomeViewController: UIViewController, UITextFieldDelegate {
     @IBAction func finished() {
         UserDefaults.standard.integer(forKey: "CaloricGoal")
         UserDefaults.standard.set(textField.text!, forKey: "CaloricGoal")
+        
         Core.shared.setIsNotNewUser()
         dismiss(animated: true)
     }

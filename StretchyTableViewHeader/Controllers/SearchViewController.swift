@@ -13,7 +13,36 @@ import CoreData
  Save saves the entry to the diary list
  */
 
-class SearchViewController: UIViewController {
+class SearchViewController: UIViewController, EntryDetailViewControllerDelegate {
+    func addItemViewControllerDidCancel(_ controller: EntryDetailViewController) {
+        navigationController?.popViewController(animated: true)
+    }
+    
+    
+    var date = Date()
+    
+    func addItemViewController<T>(_ controller: EntryDetailViewController, didFinishAdding obj: T) {
+        guard let mainView = navigationController?.parent?.view else { return }
+        let hudView = HudView.hud(inView: mainView, animated: true)
+        hudView.text = "Logged"
+  
+            let foodEntry = controller.foodEntryToAdd
+            if let foodEntry = foodEntry {
+
+                var entry = DiaryEntry(context: managedObjectContext)
+                entry = convert(foodEntry: foodEntry, toDiary: entry)
+                do {
+                    try managedObjectContext.save()
+                    afterDelay(0.6) {
+                        hudView.hide()
+                    }
+                } catch {
+                    fatalError("Error: \(error)")
+                }
+            }
+        navigationController?.popViewController(animated: true)
+    }
+    
 
     struct TableView {
       struct CellIdentifiers {
@@ -109,42 +138,10 @@ class SearchViewController: UIViewController {
         entry.serving_qty = Int16(food.serving_qty)
         entry.serving_weight_grams = Int16(food.serving_weight_grams)
         entry.nf_total_fat = food.nf_total_fat!
+        entry.dateLogged = Date()
         return entry
     }
-    
-    /*
-     Unwind segue from EntryDetailViewController back to SearchResults
-     */
-    @IBAction func cancel(_ unwindSegue: UIStoryboardSegue) {
-        print("CANCEL CLICKEDDDDDDD")
-    }
-    
-    /*
-     LogFood button on EntryDetailViewControlelr
-     */
-    @IBAction func saveeeee(_ unwindeSegue: UIStoryboardSegue) {
-        guard let mainView = navigationController?.parent?.view else { return }
-        let hudView = HudView.hud(inView: mainView, animated: true)
-        hudView.text = "Logged"
         
-        if let entryDetailViewController = unwindeSegue.source as? EntryDetailViewController {
-            let foodEntry = entryDetailViewController.foodEntryToAdd
-            if let foodEntry = foodEntry {
-
-                var entry = DiaryEntry(context: managedObjectContext)
-                entry = convert(foodEntry: foodEntry, toDiary: entry)
-                do {
-                    try managedObjectContext.save()
-                    afterDelay(0.6) {
-                        hudView.hide()
-                    }
-                } catch {
-                    fatalError("Error: \(error)")
-                }
-            }
-        }
-    }
-    
     // MARK: - Navigation
 
     // "foodItem" is the segue from Search to Entry
@@ -155,6 +152,7 @@ class SearchViewController: UIViewController {
             let indexPath = sender as! IndexPath
             let foodDetail = foodResult.foods[indexPath.row]
             controller.foodEntryToAdd = foodDetail
+            controller.delegate = self
         }
     }
     

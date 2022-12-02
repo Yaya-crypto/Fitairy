@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21512" systemVersion="21G217" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="DiaryEntry" representedClassName="DiaryEntry" syncable="YES">
+        <attribute name="dateLogged" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="food_name" attributeType="String"/>
         <attribute name="nf_calories" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="nf_protein" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>

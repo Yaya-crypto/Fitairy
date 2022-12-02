@@ -15,3 +15,12 @@ let applicationDocumentsDirectory: URL = {
 
   return paths[0]
 }()
+
+
+ let dateFormatter: DateFormatter = {
+  let formatter = DateFormatter()
+//      formatter.dateStyle = .short
+//      formatter.timeStyle = .none
+    formatter.dateFormat = "MM/dd"
+  return formatter
+}()

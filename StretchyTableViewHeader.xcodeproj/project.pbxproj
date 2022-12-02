@@ -65,6 +65,28 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		090DE2EC293441B900183614 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				09ABB2A529316A1100F0DBA7 /* DiaryTableViewController.swift */,
+				09ABB2B8293173BF00F0DBA7 /* SearchViewController.swift */,
+				09ABB2BE2931757C00F0DBA7 /* EntryDetailViewController.swift */,
+				09ABB2C02931789900F0DBA7 /* ProfileDetailViewController.swift */,
+				09ABB2C229317B7C00F0DBA7 /* WelcomeViewController.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		090DE2ED293441EB00183614 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				09ABB2BA2931745400F0DBA7 /* FoodEntry.swift */,
+				096CEF3529334A4400DD8B8F /* DiaryEntry+CoreDataProperties.swift */,
+				096CEF3429334A4400DD8B8F /* DiaryEntry+CoreDataClass.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		09ABB29529316A1100F0DBA7 = {
 			isa = PBXGroup;
 			children = (
@@ -84,22 +106,16 @@
 		09ABB2A029316A1100F0DBA7 /* StretchyTableViewHeader */ = {
 			isa = PBXGroup;
 			children = (
-				096CEF3529334A4400DD8B8F /* DiaryEntry+CoreDataProperties.swift */,
-				096CEF3429334A4400DD8B8F /* DiaryEntry+CoreDataClass.swift */,
+				090DE2ED293441EB00183614 /* Model */,
+				090DE2EC293441B900183614 /* Controllers */,
 				09ABB2A129316A1100F0DBA7 /* AppDelegate.swift */,
 				09ABB2A329316A1100F0DBA7 /* SceneDelegate.swift */,
-				09ABB2A529316A1100F0DBA7 /* DiaryTableViewController.swift */,
 				09ABB2A729316A1100F0DBA7 /* Main.storyboard */,
 				09ABB2AD29316A1200F0DBA7 /* Assets.xcassets */,
 				09ABB2AF29316A1200F0DBA7 /* LaunchScreen.storyboard */,
 				09ABB2B229316A1200F0DBA7 /* Info.plist */,
 				09ABB2AA29316A1100F0DBA7 /* StretchyTableViewHeader.xcdatamodeld */,
-				09ABB2B8293173BF00F0DBA7 /* SearchViewController.swift */,
-				09ABB2BA2931745400F0DBA7 /* FoodEntry.swift */,
 				09ABB2BC2931747700F0DBA7 /* Core.swift */,
-				09ABB2BE2931757C00F0DBA7 /* EntryDetailViewController.swift */,
-				09ABB2C02931789900F0DBA7 /* ProfileDetailViewController.swift */,
-				09ABB2C229317B7C00F0DBA7 /* WelcomeViewController.swift */,
 				09ABB2C42931FF7000F0DBA7 /* SearchResultCell.xib */,
 				09ABB2C62932022900F0DBA7 /* SearchResultCell.swift */,
 				09ABB2C82932056500F0DBA7 /* NothingFoundCell.xib */,
@@ -343,6 +359,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U39RXVJA75;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = StretchyTableViewHeader/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -350,6 +367,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -370,6 +388,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U39RXVJA75;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = StretchyTableViewHeader/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -377,6 +396,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

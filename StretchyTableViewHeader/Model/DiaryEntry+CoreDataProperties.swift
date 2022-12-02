@@ -16,6 +16,7 @@ extension DiaryEntry {
         return NSFetchRequest<DiaryEntry>(entityName: "DiaryEntry")
     }
 
+    @NSManaged public var dateLogged: Date
     @NSManaged public var nf_calories: Float
     @NSManaged public var food_name: String
     @NSManaged public var serving_qty: Int16

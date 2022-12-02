@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="LGF-h3-VtN">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -229,30 +230,38 @@
                     <view key="view" contentMode="scaleToFill" id="nhg-wo-Gme">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZIw-b5-U0D">
+                                <rect key="frame" x="16" y="96" width="343" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="rML-OP-Sdb"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
                     <navigationItem key="navigationItem" id="2rR-eT-Hgv">
                         <barButtonItem key="leftBarButtonItem" title="Back" id="arG-Up-8tF">
                             <connections>
-                                <action selector="back" destination="Kfb-eH-gVQ" id="BJM-RR-bGk"/>
-                                <segue destination="qeo-u7-mty" kind="unwind" unwindAction="cancel:" id="WbZ-ej-Nsb"/>
+                                <action selector="cancel" destination="Kfb-eH-gVQ" id="Az8-kq-CBB"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="done" id="XjC-W8-1SS">
                             <connections>
-                                <segue destination="qeo-u7-mty" kind="unwind" unwindAction="saveeeee:" id="WMI-AG-Esq"/>
+                                <action selector="logFood" destination="Kfb-eH-gVQ" id="9xd-uc-ayL"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="caloriesLabel" destination="ZIw-b5-U0D" id="WWp-Yw-zWJ"/>
                         <outlet property="doneBarButton" destination="XjC-W8-1SS" id="oRL-hl-J99"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="HGp-Uk-RTT" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-                <exit id="qeo-u7-mty" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="3790" y="-34"/>
+            <point key="canvasLocation" x="3789.5999999999999" y="-34.632683658170919"/>
         </scene>
         <!--Welcome View Controller-->
         <scene sceneID="8b9-Ou-Sm6">
@@ -326,7 +335,7 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="0AE-Wv-RSE"/>
+        <segue reference="Z2v-Ss-tB2"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="book.fill" catalog="system" width="128" height="95"/>
