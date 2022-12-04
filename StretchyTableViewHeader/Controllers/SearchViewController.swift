@@ -8,41 +8,9 @@
 import UIKit
 import CoreData
 
-/*
- Protocol for Delegate. DiaryTableViewController is the delegate used
- Save saves the entry to the diary list
- */
-
-class SearchViewController: UIViewController, EntryDetailViewControllerDelegate {
-    func addItemViewControllerDidCancel(_ controller: EntryDetailViewController) {
-        navigationController?.popViewController(animated: true)
-    }
-    
+class SearchViewController: UIViewController {
     
     var date = Date()
-    
-    func addItemViewController<T>(_ controller: EntryDetailViewController, didFinishAdding obj: T) {
-        guard let mainView = navigationController?.parent?.view else { return }
-        let hudView = HudView.hud(inView: mainView, animated: true)
-        hudView.text = "Logged"
-  
-            let foodEntry = controller.foodEntryToAdd
-            if let foodEntry = foodEntry {
-
-                var entry = DiaryEntry(context: managedObjectContext)
-                entry = convert(foodEntry: foodEntry, toDiary: entry)
-                do {
-                    try managedObjectContext.save()
-                    afterDelay(0.6) {
-                        hudView.hide()
-                    }
-                } catch {
-                    fatalError("Error: \(error)")
-                }
-            }
-        navigationController?.popViewController(animated: true)
-    }
-    
 
     struct TableView {
       struct CellIdentifiers {
@@ -83,6 +51,7 @@ class SearchViewController: UIViewController, EntryDetailViewControllerDelegate 
         
         // Keyboard popup on launch
          searchBar.becomeFirstResponder()
+        dismissKeyboard()
     }
     
     /*
@@ -129,6 +98,9 @@ class SearchViewController: UIViewController, EntryDetailViewControllerDelegate 
         execute: run)
     }
     
+    /*
+     Changes the API response FoodEntry to the CoreData model DiaryEntry
+     */
     func convert(foodEntry food: FoodEntry.food, toDiary entry: DiaryEntry) -> DiaryEntry {
         entry.food_name = food.food_name
         entry.nf_calories = food.nf_calories
@@ -141,24 +113,7 @@ class SearchViewController: UIViewController, EntryDetailViewControllerDelegate 
         entry.dateLogged = Date()
         return entry
     }
-        
-    // MARK: - Navigation
-
-    // "foodItem" is the segue from Search to Entry
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
-        if segue.identifier == "foodItem" {
-            let controller = segue.destination as! EntryDetailViewController
-            let indexPath = sender as! IndexPath
-            let foodDetail = foodResult.foods[indexPath.row]
-            controller.foodEntryToAdd = foodDetail
-            controller.delegate = self
-        }
-    }
     
-
-}
-
     /*
      Required Headers
      Body is user input (e.g "One cup on orange juice")
@@ -184,6 +139,34 @@ class SearchViewController: UIViewController, EntryDetailViewControllerDelegate 
        return request
         
     }
+    
+    func dismissKeyboard() {
+           let tap: UITapGestureRecognizer = UITapGestureRecognizer( target:     self, action:    #selector(dismissKeyboardTouchOutside))
+           tap.cancelsTouchesInView = false
+           view.addGestureRecognizer(tap)
+        }
+        
+    @objc private func dismissKeyboardTouchOutside() {
+       view.endEditing(true)
+    }
+        
+    // MARK: - Navigation
+
+    // "foodItem" is the segue from Search to Entry
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        if segue.identifier == "foodItem" {
+            let controller = segue.destination as! EntryDetailViewController
+            let indexPath = sender as! IndexPath
+            let foodDetail = foodResult.foods[indexPath.row]
+            controller.foodEntryToAdd = foodDetail
+            controller.delegate = self
+        }
+    }
+    
+
+}
+
 
 extension SearchViewController: UISearchBarDelegate {
     
@@ -320,3 +303,37 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     
 }
 
+/*
+ Protocol for Delegate. DiaryTableViewController is the delegate used
+ Save saves the entry to the diary list
+ */
+
+extension SearchViewController: EntryDetailViewControllerDelegate {
+    
+    func addItemViewControllerDidCancel(_ controller: EntryDetailViewController) {
+        navigationController?.popViewController(animated: true)
+    }
+    
+    func addItemViewController<T>(_ controller: EntryDetailViewController, didFinishAdding obj: T) {
+        guard let mainView = navigationController?.parent?.view else { return }
+        let hudView = HudView.hud(inView: mainView, animated: true)
+        hudView.text = "Logged"
+  
+            let foodEntry = controller.foodEntryToAdd
+            if let foodEntry = foodEntry {
+
+                var entry = DiaryEntry(context: managedObjectContext)
+                entry = convert(foodEntry: foodEntry, toDiary: entry)
+                do {
+                    try managedObjectContext.save()
+                    afterDelay(0.6) {
+                        hudView.hide()
+                    }
+                } catch {
+                    fatalError("Error: \(error)")
+                }
+            }
+        navigationController?.popViewController(animated: true)
+    }
+    
+}

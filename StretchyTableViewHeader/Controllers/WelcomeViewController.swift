@@ -21,6 +21,7 @@ class WelcomeViewController: UIViewController, UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        dismissKeyboard()
     }
     
     
@@ -69,6 +70,16 @@ class WelcomeViewController: UIViewController, UITextFieldDelegate {
         return true
     }
 
+    func dismissKeyboard() {
+           let tap: UITapGestureRecognizer = UITapGestureRecognizer( target:     self, action:    #selector(dismissKeyboardTouchOutside))
+           tap.cancelsTouchesInView = false
+           view.addGestureRecognizer(tap)
+        }
+        
+    @objc private func dismissKeyboardTouchOutside() {
+       view.endEditing(true)
+    }
+    
     /*
      So constraints for holderview r added
      */

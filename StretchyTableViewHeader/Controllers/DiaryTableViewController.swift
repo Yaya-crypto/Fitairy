@@ -8,49 +8,31 @@
 import UIKit
 import CoreData
 
-class DiaryTableViewController: UITableViewController, EntryDetailViewControllerDelegate {
-    
-    // Disable done button
-    func addItemViewController<T>(_ controller: EntryDetailViewController, didFinishAdding obj: T) {
-        print("")
-    }
-    
-    
-    func addItemViewControllerDidCancel(_ controller: EntryDetailViewController) {
-        navigationController?.popViewController(animated: true)
-    }
-    
-    
+class DiaryTableViewController: UITableViewController {
+    let caloriesConsumedLabel = UILabel()
     var managedObjectContext: NSManagedObjectContext!
-    var caloriesConsumed = Float()
+    var caloricGoal = UserDefaults.standard.integer(forKey: "CaloricGoal")
+    var caloriesConsumed = 0
+    var caloriesLeft = UserDefaults.standard.integer(forKey: "CaloricGoal")
     
-    lazy var fetchedResultsController: NSFetchedResultsController<DiaryEntry> = { // 12/01 ==
+    lazy var fetchedResultsController: NSFetchedResultsController<DiaryEntry> = {
         let fetchRequest = NSFetchRequest<DiaryEntry>()
-
-        // Get the current calendar with local time zone
+       //managedObjectContext.stalenessInterval = 0.0
+        // Get the current calendar with local time zone NSDATEformatter for locale timezone, store in UTC
         var calendar = Calendar.current
         calendar.timeZone = NSTimeZone.local
-        
-        var userLocale = calendar.locale // NSDATEformatter for locale timezone, store in UTC
         
         // Get today's beginning & end
         let dateFrom = calendar.startOfDay(for: Date())                     // 2022-12-01 05:00:00 +0000 -5
         let dateTo =  calendar.date(byAdding: .day, value: 1, to: dateFrom) // 2022-12-02 05:00:00 +0000 -5
-
+        
         // Set predicate as date being today's date
         // If the date is greater than starting date or less than next date
-         let datePredicate = NSPredicate(format: "dateLogged >= %@ AND dateLogged <= %@", dateFrom as NSDate, dateTo! as NSDate)
-
-        
-        print("------- DATE FROM") // 2022-12-01 05:00:00 +0000
-        print(dateFrom)
-        print("------- DATE TO")   // 2022-12-02 05:00:00 +0000
-        print(dateTo!)
-                                  // 2022-12-01 17:30:53 +0000 orange
+        let datePredicate = NSPredicate(format: "dateLogged >= %@ AND dateLogged <= %@", dateFrom as NSDate, dateTo! as NSDate)
 
         let entity = DiaryEntry.entity()
         fetchRequest.entity = entity
-       
+
         let sortDescriptor = NSSortDescriptor(key: "nf_calories", ascending: false)
         fetchRequest.sortDescriptors = [sortDescriptor]
         
@@ -60,17 +42,19 @@ class DiaryTableViewController: UITableViewController, EntryDetailViewController
           fetchRequest: fetchRequest,
           managedObjectContext: self.managedObjectContext,
           sectionNameKeyPath: nil,
-          cacheName: "DiaryEntry")
+          cacheName: nil)
         
         fetchedResultsController.delegate = self
+        
         return fetchedResultsController
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        title = dateFormatter.string(from: Date())
         performFetch()
+        caloriesConsumedLabel.text = updateCaloricTotal().description
     }
-    
     
     // MARK: Table View Delegates
     
@@ -129,29 +113,57 @@ class DiaryTableViewController: UITableViewController, EntryDetailViewController
         }
     }
     
-//    override func tableView(
-//        _ tableView: UITableView,
-//        viewForHeaderInSection section: Int
-//    ) -> UIView? {
-//
-//        let sectionHeaderBackgroundColor = UIColor(hue: 0.021, saturation: 0.34, brightness: 0.94, alpha: 0.4)
-//        let vw = UIView()
-//        vw.frame = CGRect(x: 3, y: 10, width: 30, height: 30)
-//        vw.backgroundColor = sectionHeaderBackgroundColor
-//
-//        let calorieLabel = UILabel()
-//        calorieLabel.text = "\(UserDefaults.standard.integer(forKey: "CaloricGoal"))"
-//        calorieLabel.frame = CGRect(x: 43, y: 5, width: 250, height: 40)
-//
-//        let caloriesConsumedlabel = UILabel()
-//        calorieLabel.text = "\(caloriesConsumed)"
-//        calorieLabel.frame = CGRect(x: 63, y: 5, width: 250, height: 40)
-//
-//        vw.addSubview(calorieLabel)
-//       // vw.backgroundColor = UIColor.red
-//
-//        return vw
-//    }
+    override func tableView(
+        _ tableView: UITableView,
+        viewForHeaderInSection section: Int
+    ) -> UIView? {
+
+        let vw = UIView()
+
+
+        let calorieLabel = UILabel()
+        calorieLabel.textAlignment = .center
+        
+        calorieLabel.text = "\(caloricGoal) \t + \t \(updateCaloricTotal().description) \t = \t \(caloriesLeft)"
+        
+        calorieLabel.frame = CGRect(x: 43, y: 5, width: 250, height: 40)
+      
+
+        caloriesConsumedLabel.text = "\(updateCaloricTotal().description)"
+        caloriesConsumedLabel.frame = CGRect(x: 153, y: 5, width: 250, height: 40)
+
+        vw.addSubview(calorieLabel)
+        //vw.addSubview(caloriesConsumedLabel)
+        vw.backgroundColor = UIColor.systemTeal
+
+        return vw
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 50
+    }
+    
+    /*
+     Updates the caloryGoal for the UILabel
+     Red if the User went over the goal
+     Green if the User is within the limit
+     */
+    func updateCaloricTotal() -> Int {
+        caloriesConsumed = 0
+        fetchedResultsController.fetchedObjects?.forEach {entry in
+            caloriesConsumed += Int(entry.nf_calories)
+        }
+        
+        if caloriesConsumed > caloricGoal {
+            caloriesConsumedLabel.textColor = .red
+        } else {
+            caloriesConsumedLabel.textColor = .green
+        }
+        
+        caloriesLeft = caloricGoal - caloriesConsumed
+        return caloriesConsumed
+    }
+
     
     override func tableView(
       _ tableView: UITableView,
@@ -234,9 +246,10 @@ extension DiaryTableViewController: NSFetchedResultsControllerDelegate {
         switch type {
         case .insert:
             tableView.insertRows(at: [newIndexPath!], with: .fade)
-            
+            caloriesConsumedLabel.text = updateCaloricTotal().description
         case .delete:
             tableView.deleteRows(at: [indexPath!], with: .fade)
+            caloriesConsumedLabel.text = updateCaloricTotal().description
             
         case .move:
             fallthrough
@@ -271,7 +284,18 @@ extension DiaryTableViewController: NSFetchedResultsControllerDelegate {
                 break
             }
         }
+}
+
+extension DiaryTableViewController: EntryDetailViewControllerDelegate {
+    
+    // Disable done button
+    func addItemViewController<T>(_ controller: EntryDetailViewController, didFinishAdding obj: T) {
+        print("")
+    }
     
     
+    func addItemViewControllerDidCancel(_ controller: EntryDetailViewController) {
+        navigationController?.popViewController(animated: true)
+    }
     
 }
