@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		09173E74293CE46A0041FB72 /* ViewForHeaderInDiary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09173E73293CE46A0041FB72 /* ViewForHeaderInDiary.swift */; };
 		096CEF2F293336D200DD8B8F /* HudView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 096CEF2E293336D200DD8B8F /* HudView.swift */; };
 		096CEF3629334A4400DD8B8F /* DiaryEntry+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 096CEF3429334A4400DD8B8F /* DiaryEntry+CoreDataClass.swift */; };
 		096CEF3729334A4400DD8B8F /* DiaryEntry+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 096CEF3529334A4400DD8B8F /* DiaryEntry+CoreDataProperties.swift */; };
@@ -30,6 +31,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		09173E73293CE46A0041FB72 /* ViewForHeaderInDiary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewForHeaderInDiary.swift; sourceTree = "<group>"; };
 		096CEF2E293336D200DD8B8F /* HudView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HudView.swift; sourceTree = "<group>"; };
 		096CEF3429334A4400DD8B8F /* DiaryEntry+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DiaryEntry+CoreDataClass.swift"; sourceTree = "<group>"; };
 		096CEF3529334A4400DD8B8F /* DiaryEntry+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DiaryEntry+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -83,6 +85,7 @@
 				09ABB2BA2931745400F0DBA7 /* FoodEntry.swift */,
 				096CEF3529334A4400DD8B8F /* DiaryEntry+CoreDataProperties.swift */,
 				096CEF3429334A4400DD8B8F /* DiaryEntry+CoreDataClass.swift */,
+				09173E73293CE46A0041FB72 /* ViewForHeaderInDiary.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -198,6 +201,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				09173E74293CE46A0041FB72 /* ViewForHeaderInDiary.swift in Sources */,
 				096CEF3729334A4400DD8B8F /* DiaryEntry+CoreDataProperties.swift in Sources */,
 				09ABB2B9293173BF00F0DBA7 /* SearchViewController.swift in Sources */,
 				09ABB2C329317B7C00F0DBA7 /* WelcomeViewController.swift in Sources */,
@@ -362,6 +366,7 @@
 				DEVELOPMENT_TEAM = U39RXVJA75;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = StretchyTableViewHeader/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Fitary;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -391,6 +396,7 @@
 				DEVELOPMENT_TEAM = U39RXVJA75;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = StretchyTableViewHeader/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Fitary;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;

@@ -309,6 +309,20 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
  */
 
 extension SearchViewController: EntryDetailViewControllerDelegate {
+    func showEntryDetailsOnLoad<T>(_ controller: EntryDetailViewController, didFinishAdding obj: T) {
+        if let foodEntry = controller.foodEntryToAdd {
+            controller.title = "Log Food"
+            controller.foodNameLabel.text = foodEntry.food_name.capitalized
+            controller.caloriesLabel.text = foodEntry.nf_calories.description
+            controller.fatLabel.text = foodEntry.nf_total_fat.get(or: 0).description
+            controller.carbsLabel.text = foodEntry.nf_total_carbohydrate.get(or: 0).description
+            controller.sugarsLabel.text = foodEntry.nf_sugars.get(or: 0).description
+            controller.proteinLabel.text = foodEntry.nf_protein.get(or: 0).description
+            controller.gramsLabel.text = foodEntry.serving_weight_grams.description
+            controller.loggedTimeLabel.text = dateFormatter.string(from: date)
+        }
+    }
+    
     
     func addItemViewControllerDidCancel(_ controller: EntryDetailViewController) {
         navigationController?.popViewController(animated: true)

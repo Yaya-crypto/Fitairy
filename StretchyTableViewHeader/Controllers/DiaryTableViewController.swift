@@ -9,15 +9,15 @@ import UIKit
 import CoreData
 
 class DiaryTableViewController: UITableViewController {
-    let caloriesConsumedLabel = UILabel()
     var managedObjectContext: NSManagedObjectContext!
     var caloricGoal = UserDefaults.standard.integer(forKey: "CaloricGoal")
     var caloriesConsumed = 0
-    var caloriesLeft = UserDefaults.standard.integer(forKey: "CaloricGoal")
+    var caloriesLeft = 0
+    var headerView = ViewForHeaderInDiary()
     
     lazy var fetchedResultsController: NSFetchedResultsController<DiaryEntry> = {
         let fetchRequest = NSFetchRequest<DiaryEntry>()
-       //managedObjectContext.stalenessInterval = 0.0
+
         // Get the current calendar with local time zone NSDATEformatter for locale timezone, store in UTC
         var calendar = Calendar.current
         calendar.timeZone = NSTimeZone.local
@@ -51,9 +51,12 @@ class DiaryTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = UIColor().hexStringToUIColor(hex: "AFDCEB")
+        
         title = dateFormatter.string(from: Date())
         performFetch()
-        caloriesConsumedLabel.text = updateCaloricTotal().description
+        updateCaloricTotal()
+        headerView.changeCaloriesLabel(caloriesConsumed: caloriesConsumed, caloriesLeft: caloriesLeft, caloricGoal: caloricGoal)
     }
     
     // MARK: Table View Delegates
@@ -117,26 +120,7 @@ class DiaryTableViewController: UITableViewController {
         _ tableView: UITableView,
         viewForHeaderInSection section: Int
     ) -> UIView? {
-
-        let vw = UIView()
-
-
-        let calorieLabel = UILabel()
-        calorieLabel.textAlignment = .center
-        
-        calorieLabel.text = "\(caloricGoal) \t + \t \(updateCaloricTotal().description) \t = \t \(caloriesLeft)"
-        
-        calorieLabel.frame = CGRect(x: 43, y: 5, width: 250, height: 40)
-      
-
-        caloriesConsumedLabel.text = "\(updateCaloricTotal().description)"
-        caloriesConsumedLabel.frame = CGRect(x: 153, y: 5, width: 250, height: 40)
-
-        vw.addSubview(calorieLabel)
-        //vw.addSubview(caloriesConsumedLabel)
-        vw.backgroundColor = UIColor.systemTeal
-
-        return vw
+        return headerView
     }
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -148,20 +132,15 @@ class DiaryTableViewController: UITableViewController {
      Red if the User went over the goal
      Green if the User is within the limit
      */
-    func updateCaloricTotal() -> Int {
+    func updateCaloricTotal() {
         caloriesConsumed = 0
+        caloriesLeft = 0
+        
         fetchedResultsController.fetchedObjects?.forEach {entry in
             caloriesConsumed += Int(entry.nf_calories)
         }
-        
-        if caloriesConsumed > caloricGoal {
-            caloriesConsumedLabel.textColor = .red
-        } else {
-            caloriesConsumedLabel.textColor = .green
-        }
-        
         caloriesLeft = caloricGoal - caloriesConsumed
-        return caloriesConsumed
+
     }
 
     
@@ -169,6 +148,7 @@ class DiaryTableViewController: UITableViewController {
       _ tableView: UITableView,
       didSelectRowAt indexPath: IndexPath) {
       tableView.deselectRow(at: indexPath, animated: true)
+          
     }
 
     
@@ -246,11 +226,13 @@ extension DiaryTableViewController: NSFetchedResultsControllerDelegate {
         switch type {
         case .insert:
             tableView.insertRows(at: [newIndexPath!], with: .fade)
-            caloriesConsumedLabel.text = updateCaloricTotal().description
+            updateCaloricTotal()
+            headerView.changeCaloriesLabel(caloriesConsumed: caloriesConsumed, caloriesLeft: caloriesLeft, caloricGoal: caloricGoal)
+            
         case .delete:
             tableView.deleteRows(at: [indexPath!], with: .fade)
-            caloriesConsumedLabel.text = updateCaloricTotal().description
-            
+            updateCaloricTotal()
+            headerView.changeCaloriesLabel(caloriesConsumed: caloriesConsumed, caloriesLeft: caloriesLeft, caloricGoal: caloricGoal)
         case .move:
             fallthrough
         case .update:
@@ -287,6 +269,20 @@ extension DiaryTableViewController: NSFetchedResultsControllerDelegate {
 }
 
 extension DiaryTableViewController: EntryDetailViewControllerDelegate {
+    func showEntryDetailsOnLoad<T>(_ controller: EntryDetailViewController, didFinishAdding obj: T) {
+        if let foodEntry = controller.diaryEntry {
+            controller.title = "Entry"
+            controller.foodNameLabel.text = foodEntry.food_name.capitalized
+            controller.caloriesLabel.text = foodEntry.nf_calories.description
+            controller.fatLabel.text = foodEntry.nf_total_fat.description
+            controller.carbsLabel.text = foodEntry.nf_total_carbohydrate.description
+            controller.sugarsLabel.text = foodEntry.nf_sugars.description
+            controller.proteinLabel.text = foodEntry.nf_protein.description
+            controller.gramsLabel.text = foodEntry.serving_weight_grams.description
+            controller.loggedTimeLabel.text = dateFormatter.string(from: foodEntry.dateLogged)
+        }
+    }
+    
     
     // Disable done button
     func addItemViewController<T>(_ controller: EntryDetailViewController, didFinishAdding obj: T) {
