@@ -41,6 +41,7 @@ class EntryDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor().hexStringToUIColor(hex: "AFDCEB")
+        
         // From SearchViewController
         if let food = foodEntryToAdd {
             delegate?.showEntryDetailsOnLoad(self, didFinishAdding: food)
@@ -55,13 +56,16 @@ class EntryDetailViewController: UIViewController {
     }
     
     /*
-     TODO: Figure out how to go back from clicking on the diary screen and disable Done button
+     From Diary and Search controller. Cancel will return to previous screen
      */
-    
     @IBAction func cancel() {
         delegate?.addItemViewControllerDidCancel(self)
     }
     
+    /*
+     If the entry was from Search controller 'foodEntryToAdd' then log
+     Else Do nothing
+     */
     @IBAction func logFood() {
         if let food = foodEntryToAdd {
             delegate?.addItemViewController(self, didFinishAdding: food)

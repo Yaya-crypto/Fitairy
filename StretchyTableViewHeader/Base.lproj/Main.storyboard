@@ -36,30 +36,25 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <sections>
-                            <tableViewSection id="Ke8-Lc-As0">
+                            <tableViewSection footerTitle="Current Goal 2500" id="Ke8-Lc-As0">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="vhx-WX-Q7f">
-                                        <rect key="frame" x="0.0" y="50" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="50" width="375" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="vhx-WX-Q7f" id="Iie-Lu-vro">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Hello" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="wfq-7Z-igc">
-                                                    <rect key="frame" x="16" y="4" width="343" height="35"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="34.5" id="pyj-9C-7Do"/>
-                                                    </constraints>
+                                                <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Hello" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="wfq-7Z-igc">
+                                                    <rect key="frame" x="0.0" y="0.0" width="375" height="40"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                     <textInputTraits key="textInputTraits"/>
+                                                    <connections>
+                                                        <outlet property="delegate" destination="0Sj-Ji-fLL" id="zCm-09-Xdc"/>
+                                                    </connections>
                                                 </textField>
                                             </subviews>
-                                            <constraints>
-                                                <constraint firstItem="wfq-7Z-igc" firstAttribute="leading" secondItem="Iie-Lu-vro" secondAttribute="leading" constant="16" id="ckr-QV-S3o"/>
-                                                <constraint firstItem="wfq-7Z-igc" firstAttribute="top" secondItem="Iie-Lu-vro" secondAttribute="top" constant="4" id="exS-9l-Moo"/>
-                                                <constraint firstAttribute="bottom" secondItem="wfq-7Z-igc" secondAttribute="bottom" constant="5" id="fao-uo-Qya"/>
-                                                <constraint firstAttribute="trailing" secondItem="wfq-7Z-igc" secondAttribute="trailing" constant="16" id="rlA-E9-LoQ"/>
-                                            </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                 </cells>
@@ -71,6 +66,9 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Profile" id="Shh-FG-Qmj"/>
+                    <connections>
+                        <outlet property="textField" destination="wfq-7Z-igc" id="lwd-3Q-OHz"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="2UN-1k-8si" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>

@@ -19,7 +19,8 @@ class DiaryTableViewController: UITableViewController {
     var datePicker = UIDatePicker()
     
     // Create a variable to store the selected date
-    var selectedDate = Date()
+    var selectedDate: Date?
+    
     
     @IBOutlet weak var searchFoodButton: UIBarButtonItem!
     
@@ -31,20 +32,23 @@ class DiaryTableViewController: UITableViewController {
         calendar.timeZone = NSTimeZone.local
         
         // Get today's beginning & end
-        selectedDate = calendar.startOfDay(for: Date())                     // 2022-12-01 05:00:00 +0000 -5
-        let dateTo =  calendar.date(byAdding: .day, value: 1, to: selectedDate) // 2022-12-02 05:00:00 +0000 -5
+        
+        
+        let selectedDate2 = selectedDate.get(or: calendar.startOfDay(for: Date()))
+        let dateTo =  calendar.date(byAdding: .day, value: 1, to: selectedDate2) // 2022-12-02 05:00:00 +0000 -5
         
         // Set predicate as date being today's date
         // If the date is greater than starting date or less than next date
-        let datePredicate = NSPredicate(format: "dateLogged >= %@ AND dateLogged <= %@", selectedDate as NSDate, dateTo! as NSDate)
-
+        let datePredicate = NSPredicate(format: "dateLogged >= %@ AND dateLogged <= %@", selectedDate2 as NSDate, dateTo! as NSDate)
+        fetchRequest.predicate = datePredicate
+        
         let entity = DiaryEntry.entity()
         fetchRequest.entity = entity
 
         let sortDescriptor = NSSortDescriptor(key: "nf_calories", ascending: false)
         fetchRequest.sortDescriptors = [sortDescriptor]
         
-        fetchRequest.predicate = datePredicate
+        
         
         let fetchedResultsController = NSFetchedResultsController(
           fetchRequest: fetchRequest,
@@ -57,12 +61,9 @@ class DiaryTableViewController: UITableViewController {
         return fetchedResultsController
     }()
         
-
-
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor().hexStringToUIColor(hex: "AFDCEB")
-        
         let attrs = [
             NSAttributedString.Key.font: UIFont(name: "Helvetica", size: 18)!
         ]
@@ -71,9 +72,12 @@ class DiaryTableViewController: UITableViewController {
         performFetch()
         updateCaloricTotal()
         headerView.changeCaloriesLabel(caloriesConsumed: caloriesConsumed, caloriesLeft: caloriesLeft, caloricGoal: caloricGoal)
+        datePickerOnNavbarTitle()
     }
     
-
+    override func viewWillAppear(_ animated: Bool) {
+        tableView.reloadData()
+    }
     
     // MARK: Table View Delegates
     
@@ -83,7 +87,7 @@ class DiaryTableViewController: UITableViewController {
           
       let cell = tableView.dequeueReusableCell(withIdentifier: "FoodEntry", for: indexPath)
 
-      cell.backgroundColor = UIColor().hexStringToUIColor(hex: "ADD8E6")
+          cell.backgroundColor = UIColor().hexStringToUIColor(hex: "ADD8E6")
       let item = fetchedResultsController.object(at: indexPath)
       configureText(for: cell, with: item)
 
@@ -160,6 +164,47 @@ class DiaryTableViewController: UITableViewController {
 
     }
     
+    func datePickerOnNavbarTitle() {
+        // Set the mode to the date picker
+        datePicker.datePickerMode = .date
+
+        // Set the navigation bar title to the date picker
+        navigationItem.titleView = datePicker
+
+        // Add a tap gesture recognizer to the navigation bar title
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTapNavigationBarTitle))
+        navigationItem.titleView?.addGestureRecognizer(tapGestureRecognizer)
+
+        // Add a target-action for the date picker's value changed event
+        datePicker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
+
+        // Add a tap gesture recognizer to the view
+       // let viewTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTapView))
+        //view.addGestureRecognizer(viewTapGestureRecognizer)
+    }
+    
+    @objc func didTapNavigationBarTitle() {
+        // Open the date picker at the bottom of the screen
+        datePicker.frame = CGRect(x: 0, y: view.frame.height - datePicker.frame.height, width: view.frame.width, height: datePicker.frame.height)
+        view.addSubview(datePicker)
+        
+    }
+    
+    @objc func dateChanged() {
+        // Save the selected date when it is changed
+        selectedDate = datePicker.date
+        performFetch()
+        tableView.reloadData()
+        
+    }
+
+    @objc func didTapView() {
+        // Hide the date picker if it is open
+        if datePicker.isDescendant(of: view) {
+            datePicker.removeFromSuperview()
+        }
+    }
+
     override func tableView(
       _ tableView: UITableView,
       didSelectRowAt indexPath: IndexPath) {
@@ -212,7 +257,7 @@ class DiaryTableViewController: UITableViewController {
       with item: DiaryEntry) {
           
       let label = cell.viewWithTag(1000) as! UILabel
-      label.text = "\(item.food_name) Calories: \(item.nf_calories)"
+          label.text = "\(item.food_name.capitalized) \(item.serving_weight_grams)g"
     }
     
     func performFetch() {
@@ -289,11 +334,11 @@ extension DiaryTableViewController: EntryDetailViewControllerDelegate {
         if let foodEntry = controller.diaryEntry {
             controller.title = "Entry"
             controller.foodNameLabel.text = foodEntry.food_name.capitalized
-            controller.caloriesLabel.text = foodEntry.nf_calories.description
-            controller.fatLabel.text = foodEntry.nf_total_fat.description
-            controller.carbsLabel.text = foodEntry.nf_total_carbohydrate.description
-            controller.sugarsLabel.text = foodEntry.nf_sugars.description
-            controller.proteinLabel.text = foodEntry.nf_protein.description
+            controller.caloriesLabel.text = foodEntry.nf_calories.description + "g"
+            controller.fatLabel.text = foodEntry.nf_total_fat.description + "g"
+            controller.carbsLabel.text = foodEntry.nf_total_carbohydrate.description + "g"
+            controller.sugarsLabel.text = foodEntry.nf_sugars.description + "g"
+            controller.proteinLabel.text = foodEntry.nf_protein.description + "g"
             controller.gramsLabel.text = foodEntry.serving_weight_grams.description
             controller.loggedTimeLabel.text = dateFormatter.string(from: foodEntry.dateLogged)
         }

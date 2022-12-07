@@ -34,12 +34,18 @@ class ViewForHeaderInDiary: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
+        
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setupView()
     }
+    
+    func changeCaloricGoalLabel(newCaloricGoal: Int) {
+        caloricGoalLabel.text = newCaloricGoal.description
+    }
+    
     
     func changeCaloriesLabel(caloriesConsumed: Int, caloriesLeft: Int, caloricGoal: Int) {
 

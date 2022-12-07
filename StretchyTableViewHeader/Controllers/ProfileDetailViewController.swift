@@ -15,91 +15,75 @@ class ProfileDetailViewController: UITableViewController, UITextFieldDelegate {
         super.viewDidLoad()
         view.backgroundColor = UIColor().hexStringToUIColor(hex: "AFDCEB")
         navigationItem.largeTitleDisplayMode = .always
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        dismissKeyboard()
     }
     
+    override func viewDidLayoutSubviews() {
+        textField.keyboardType = .numberPad
+    }
 
-
-    // Mark: - Text Field Delegates
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        
-        let oldText = textField.text!
-        let stringRange = Range(range, in: oldText)!
-        let newTest = oldText.replacingCharacters(in: stringRange, with: string)
+    // MARK: - Text Field Delegates
+    
+    /*
+     Remove keyboard when user finished typing
+     */
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        textField.resignFirstResponder()
+    }
+    
+    /*
+     Disable done button if user hasnt submitted any info
+     */
+    func textFieldShouldClear(_ textField: UITextField) -> Bool {
         return true
     }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if textField.text!.isEmpty {
+            return false
+        } else {
+            UserDefaults.standard.set(textField.text, forKey: "CaloricGoal")
+            textField.text = ""
+            return true
+        }
+   
+    }
+    /*
+     Dismisses the keyboard if the user taps outside the textfield
+     */
+    func dismissKeyboard() {
+           let tap: UITapGestureRecognizer = UITapGestureRecognizer( target:     self, action:    #selector(dismissKeyboardTouchOutside))
+           tap.cancelsTouchesInView = false
+           view.addGestureRecognizer(tap)
+        }
+        
+    @objc private func dismissKeyboardTouchOutside() {
+       view.endEditing(true)
+    }
+    
+    
+    
+    
+    
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        print("---------")
-        print(tableView.numberOfSections)
         return 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
-        // #warning Incomplete implementation, return the number of rows
         return 1
     }
 
-    /*
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-
-        // Configure the cell...
-
-        return cell
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        // Return the header title for the specified section
+        return "Change Caloric goal"
     }
-    */
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
+    
+    override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+        return "Current Goal: \(UserDefaults.standard.integer(forKey: "CaloricGoal"))"
     }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
+    
+    
 
 }

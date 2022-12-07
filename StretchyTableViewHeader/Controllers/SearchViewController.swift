@@ -272,8 +272,8 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
               TableView.CellIdentifiers.searchResultCell, for: indexPath) as! SearchResultCell
             
             let searchResult = foodResult.foods[indexPath.row]
-            cell.foodMacros.text = "\(searchResult.nf_calories)"
-            cell.foodname.text = searchResult.food_name
+            cell.foodname.text = searchResult.food_name.capitalized
+            cell.foodMacros.text = "Calories: \(searchResult.nf_calories) Fat: \(searchResult.nf_total_fat.get(or: 0)) Protein: \(searchResult.nf_protein.get(or: 0))"
             return cell
         }
        
@@ -315,11 +315,11 @@ extension SearchViewController: EntryDetailViewControllerDelegate {
         if let foodEntry = controller.foodEntryToAdd {
             controller.title = "Log Food"
             controller.foodNameLabel.text = foodEntry.food_name.capitalized
-            controller.caloriesLabel.text = foodEntry.nf_calories.description
-            controller.fatLabel.text = foodEntry.nf_total_fat.get(or: 0).description
-            controller.carbsLabel.text = foodEntry.nf_total_carbohydrate.get(or: 0).description
-            controller.sugarsLabel.text = foodEntry.nf_sugars.get(or: 0).description
-            controller.proteinLabel.text = foodEntry.nf_protein.get(or: 0).description
+            controller.caloriesLabel.text = foodEntry.nf_calories.description + "g"
+            controller.fatLabel.text = foodEntry.nf_total_fat.get(or: 0).description + "g"
+            controller.carbsLabel.text = foodEntry.nf_total_carbohydrate.get(or: 0).description + "g"
+            controller.sugarsLabel.text = foodEntry.nf_sugars.get(or: 0).description + "g"
+            controller.proteinLabel.text = foodEntry.nf_protein.get(or: 0).description + "g"
             controller.gramsLabel.text = foodEntry.serving_weight_grams.description
             controller.loggedTimeLabel.text = dateFormatter.string(from: date)
         }

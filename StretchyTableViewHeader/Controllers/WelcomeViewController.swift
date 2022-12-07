@@ -8,6 +8,10 @@
 import Foundation
 import UIKit
 
+protocol WelcomeViewControllerDelegate: AnyObject {
+    func updateCaloricGoal(_ controller: EntryDetailViewController)
+}
+
 class WelcomeViewController: UIViewController, UITextFieldDelegate {
 
     @IBOutlet var imageView: UIImageView!
@@ -15,9 +19,7 @@ class WelcomeViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet var doneButton: UIButton!
     @IBOutlet weak var textField: UITextField!
     
-    
-    let scrollview = UIScrollView()
-    
+    weak var delegate: WelcomeViewControllerDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,12 +28,6 @@ class WelcomeViewController: UIViewController, UITextFieldDelegate {
     }
     
     
-    /*
-     Remove keyboard when user finished typing
-     */
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        textField.resignFirstResponder()
-    }
     
     /*
      Hide Nav and tab bar
@@ -60,14 +56,22 @@ class WelcomeViewController: UIViewController, UITextFieldDelegate {
     }
     
     /*
+     Remove keyboard when user finished typing
+     */
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        textField.resignFirstResponder()
+    }
+    
+    
+    /*
      Check user keystrokes to make sure input isnt null
      */
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         
         let oldText = textField.text!
         let stringRange = Range(range, in: oldText)!
-        let newTest = oldText.replacingCharacters(in: stringRange, with: string)
-        doneButton.isEnabled = !newTest.isEmpty
+        let newText = oldText.replacingCharacters(in: stringRange, with: string)
+        doneButton.isEnabled = !newText.isEmpty
         return true
     }
 
@@ -88,6 +92,7 @@ class WelcomeViewController: UIViewController, UITextFieldDelegate {
         super.viewDidLayoutSubviews()
         configureView()
     }
+    
     
     func configureView() {
         label.font = UIFont(name: "Thonburi", size: 32)

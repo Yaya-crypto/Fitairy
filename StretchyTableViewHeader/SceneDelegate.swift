@@ -21,7 +21,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     let tabController = window!.rootViewController as! UITabBarController
       if let tabViewControllers = tabController.viewControllers {
         let navController = tabViewControllers[0] as! UINavigationController
-          print("-------NAV \(navController.children)")
         let controller = navController.viewControllers[0] as! DiaryTableViewController
         controller.managedObjectContext = managedObjectContext
       }
