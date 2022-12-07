@@ -21,6 +21,7 @@ class WelcomeViewController: UIViewController, UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = UIColor().hexStringToUIColor(hex: "AFDCEB")
         dismissKeyboard()
     }
     

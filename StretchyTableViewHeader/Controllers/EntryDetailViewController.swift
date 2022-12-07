@@ -39,9 +39,8 @@ class EntryDetailViewController: UIViewController {
     weak var delegate: EntryDetailViewControllerDelegate?
     
     override func viewDidLoad() {
-        
         super.viewDidLoad()
-        
+        view.backgroundColor = UIColor().hexStringToUIColor(hex: "AFDCEB")
         // From SearchViewController
         if let food = foodEntryToAdd {
             delegate?.showEntryDetailsOnLoad(self, didFinishAdding: food)

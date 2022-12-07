@@ -13,6 +13,7 @@ class ProfileDetailViewController: UITableViewController, UITextFieldDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = UIColor().hexStringToUIColor(hex: "AFDCEB")
         navigationItem.largeTitleDisplayMode = .always
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -37,13 +38,13 @@ class ProfileDetailViewController: UITableViewController, UITextFieldDelegate {
         // #warning Incomplete implementation, return the number of sections
         print("---------")
         print(tableView.numberOfSections)
-        return 0
+        return 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         // #warning Incomplete implementation, return the number of rows
-        return 0
+        return 1
     }
 
     /*

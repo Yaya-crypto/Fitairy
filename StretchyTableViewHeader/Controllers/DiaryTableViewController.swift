@@ -15,6 +15,14 @@ class DiaryTableViewController: UITableViewController {
     var caloriesLeft = 0
     var headerView = ViewForHeaderInDiary()
     
+    // Create the UIDatePicker
+    var datePicker = UIDatePicker()
+    
+    // Create a variable to store the selected date
+    var selectedDate = Date()
+    
+    @IBOutlet weak var searchFoodButton: UIBarButtonItem!
+    
     lazy var fetchedResultsController: NSFetchedResultsController<DiaryEntry> = {
         let fetchRequest = NSFetchRequest<DiaryEntry>()
 
@@ -23,12 +31,12 @@ class DiaryTableViewController: UITableViewController {
         calendar.timeZone = NSTimeZone.local
         
         // Get today's beginning & end
-        let dateFrom = calendar.startOfDay(for: Date())                     // 2022-12-01 05:00:00 +0000 -5
-        let dateTo =  calendar.date(byAdding: .day, value: 1, to: dateFrom) // 2022-12-02 05:00:00 +0000 -5
+        selectedDate = calendar.startOfDay(for: Date())                     // 2022-12-01 05:00:00 +0000 -5
+        let dateTo =  calendar.date(byAdding: .day, value: 1, to: selectedDate) // 2022-12-02 05:00:00 +0000 -5
         
         // Set predicate as date being today's date
         // If the date is greater than starting date or less than next date
-        let datePredicate = NSPredicate(format: "dateLogged >= %@ AND dateLogged <= %@", dateFrom as NSDate, dateTo! as NSDate)
+        let datePredicate = NSPredicate(format: "dateLogged >= %@ AND dateLogged <= %@", selectedDate as NSDate, dateTo! as NSDate)
 
         let entity = DiaryEntry.entity()
         fetchRequest.entity = entity
@@ -48,16 +56,24 @@ class DiaryTableViewController: UITableViewController {
         
         return fetchedResultsController
     }()
-    
+        
+
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor().hexStringToUIColor(hex: "AFDCEB")
         
-        title = dateFormatter.string(from: Date())
+        let attrs = [
+            NSAttributedString.Key.font: UIFont(name: "Helvetica", size: 18)!
+        ]
+        searchFoodButton.setTitleTextAttributes(attrs, for: .normal)
+        
         performFetch()
         updateCaloricTotal()
         headerView.changeCaloriesLabel(caloriesConsumed: caloriesConsumed, caloriesLeft: caloriesLeft, caloricGoal: caloricGoal)
     }
+    
+
     
     // MARK: Table View Delegates
     
@@ -67,6 +83,7 @@ class DiaryTableViewController: UITableViewController {
           
       let cell = tableView.dequeueReusableCell(withIdentifier: "FoodEntry", for: indexPath)
 
+      cell.backgroundColor = UIColor().hexStringToUIColor(hex: "ADD8E6")
       let item = fetchedResultsController.object(at: indexPath)
       configureText(for: cell, with: item)
 
@@ -142,7 +159,6 @@ class DiaryTableViewController: UITableViewController {
         caloriesLeft = caloricGoal - caloriesConsumed
 
     }
-
     
     override func tableView(
       _ tableView: UITableView,

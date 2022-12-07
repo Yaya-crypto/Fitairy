@@ -34,6 +34,10 @@ extension Optional {
   }
 }
 
+let attrs = [
+    NSAttributedString.Key.font: UIFont(name: "Helvetica", size: 18)!
+]
+
 // https://stackoverflow.com/questions/24263007/how-to-use-hex-color-values
 extension UIColor {
     func hexStringToUIColor (hex:String) -> UIColor {

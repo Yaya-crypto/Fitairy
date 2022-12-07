@@ -19,8 +19,8 @@ extension DiaryEntry {
     @NSManaged public var dateLogged: Date
     @NSManaged public var nf_calories: Float
     @NSManaged public var food_name: String
-    @NSManaged public var serving_qty: Int16
-    @NSManaged public var serving_weight_grams: Int16
+    @NSManaged public var serving_qty: Int32
+    @NSManaged public var serving_weight_grams: Int32
     @NSManaged public var nf_total_fat: Float
     @NSManaged public var nf_total_carbohydrate: Float
     @NSManaged public var nf_sugars: Float

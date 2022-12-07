@@ -13,6 +13,7 @@ class SearchResultCell: UITableViewCell {
 
     override func awakeFromNib() {
         super.awakeFromNib()
+        backgroundColor = UIColor().hexStringToUIColor(hex: "ADD8E6")
         // Initialization code
     }
 

@@ -33,7 +33,10 @@ class SearchViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        view.backgroundColor = UIColor().hexStringToUIColor(hex: "AFDCEB")
+        searchBar.barTintColor = UIColor().hexStringToUIColor(hex: "CAE9F5")
+        searchBar.searchTextField.backgroundColor = UIColor().hexStringToUIColor(hex: "F0F8FF")
+        tableView.backgroundColor = UIColor().hexStringToUIColor(hex: "AFDCEB")
         // Sets the BookmarkIcon to a Barcode scanning icon
         searchBar.setImage(UIImage(systemName: "barcode.viewfinder"), for: .bookmark, state: .normal)
         
@@ -107,8 +110,8 @@ class SearchViewController: UIViewController {
         entry.nf_protein = food.nf_protein!
         entry.nf_total_carbohydrate = food.nf_total_carbohydrate!
         entry.nf_sugars = food.nf_sugars!
-        entry.serving_qty = Int16(food.serving_qty)
-        entry.serving_weight_grams = Int16(food.serving_weight_grams)
+        entry.serving_qty = Int32(food.serving_qty)
+        entry.serving_weight_grams = Int32(food.serving_weight_grams)
         entry.nf_total_fat = food.nf_total_fat!
         entry.dateLogged = Date()
         return entry
@@ -206,7 +209,7 @@ extension SearchViewController: UISearchBarDelegate {
                 }
                 
                 DispatchQueue.main.async {
-                  self.hasSearched = false
+                 // self.hasSearched = false
                   self.tableView.reloadData()
                 }
                 
@@ -216,7 +219,7 @@ extension SearchViewController: UISearchBarDelegate {
 
         }
 
-        
+       
     }
     
     /*
@@ -300,7 +303,6 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
         return indexPath
       }
     }
-    
 }
 
 /*
