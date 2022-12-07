@@ -21,7 +21,6 @@ class DiaryTableViewController: UITableViewController {
     // Create a variable to store the selected date
     var selectedDate: Date?
     
-    
     @IBOutlet weak var searchFoodButton: UIBarButtonItem!
     
     lazy var fetchedResultsController: NSFetchedResultsController<DiaryEntry> = {
@@ -64,9 +63,6 @@ class DiaryTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor().hexStringToUIColor(hex: "AFDCEB")
-        let attrs = [
-            NSAttributedString.Key.font: UIFont(name: "Helvetica", size: 18)!
-        ]
         searchFoodButton.setTitleTextAttributes(attrs, for: .normal)
         
         performFetch()
@@ -178,11 +174,15 @@ class DiaryTableViewController: UITableViewController {
         // Add a target-action for the date picker's value changed event
         datePicker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
 
-        // Add a tap gesture recognizer to the view
+        // Add a tap gesture recognizer to the view. Not working with cell taps
        // let viewTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTapView))
         //view.addGestureRecognizer(viewTapGestureRecognizer)
     }
     
+    /*
+     Opens a UIDatePicker if the user taps on the title of the controller
+
+     */
     @objc func didTapNavigationBarTitle() {
         // Open the date picker at the bottom of the screen
         datePicker.frame = CGRect(x: 0, y: view.frame.height - datePicker.frame.height, width: view.frame.width, height: datePicker.frame.height)
@@ -190,14 +190,23 @@ class DiaryTableViewController: UITableViewController {
         
     }
     
+    /*
+     Updates the selected date and predicate that performs the search
+     */
     @objc func dateChanged() {
         // Save the selected date when it is changed
         selectedDate = datePicker.date
+        fetchedResultsController.fetchRequest.predicate = updatePredicate()
         performFetch()
+        updateCaloricTotal()
+        headerView.changeCaloriesLabel(caloriesConsumed: caloriesConsumed, caloriesLeft: caloriesLeft, caloricGoal: caloricGoal)
         tableView.reloadData()
         
     }
 
+    /*
+     This was breaking taps for cells. not sure why...
+     */
     @objc func didTapView() {
         // Hide the date picker if it is open
         if datePicker.isDescendant(of: view) {
@@ -205,6 +214,9 @@ class DiaryTableViewController: UITableViewController {
         }
     }
 
+    /*
+     Makes a row not grey after user selected
+     */
     override func tableView(
       _ tableView: UITableView,
       didSelectRowAt indexPath: IndexPath) {
@@ -229,6 +241,11 @@ class DiaryTableViewController: UITableViewController {
     }
     
     // MARK: Navigation
+    
+    /*
+     If segue is Search Controller, pass managedObject for saving
+     If segue is Entry details pass relevant info
+     */
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "diaryEntryDetail" {
             
@@ -252,14 +269,20 @@ class DiaryTableViewController: UITableViewController {
     
     // MARK: Helper Methods
     
+    /*
+     Gives each entry cell a Label with the Name and grams
+     */
     func configureText(
       for cell: UITableViewCell,
       with item: DiaryEntry) {
           
       let label = cell.viewWithTag(1000) as! UILabel
-          label.text = "\(item.food_name.capitalized) \(item.serving_weight_grams)g"
+      label.text = "\(item.food_name.capitalized) \(item.serving_weight_grams)g"
     }
     
+    /*
+     Perfroms the loading of objects from core data
+     */
     func performFetch() {
         do {
             try fetchedResultsController.performFetch()
@@ -268,6 +291,22 @@ class DiaryTableViewController: UITableViewController {
         }
     }
     
+    /*
+     Updates the predicate based on the date the user selected.
+     */
+    func updatePredicate() -> NSPredicate {
+        // Get the current calendar with local time zone NSDATEformatter for locale timezone, store in UTC
+        var calendar = Calendar.current
+        calendar.timeZone = NSTimeZone.local
+        
+        let dateTo =  calendar.date(byAdding: .day, value: 1, to: selectedDate!) // 2022-12-02 05:00:00 +0000 -5
+        
+        // Set predicate as date being today's date
+        // If the date is greater than starting date or less than next date
+        let datePredicate = NSPredicate(format: "dateLogged >= %@ AND dateLogged <= %@", selectedDate! as NSDate, dateTo! as NSDate)
+        
+        return datePredicate
+    }
 
 }
 
@@ -294,6 +333,7 @@ extension DiaryTableViewController: NSFetchedResultsControllerDelegate {
             tableView.deleteRows(at: [indexPath!], with: .fade)
             updateCaloricTotal()
             headerView.changeCaloriesLabel(caloriesConsumed: caloriesConsumed, caloriesLeft: caloriesLeft, caloricGoal: caloricGoal)
+            
         case .move:
             fallthrough
         case .update:

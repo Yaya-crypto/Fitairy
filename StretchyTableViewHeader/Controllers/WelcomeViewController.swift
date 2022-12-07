@@ -8,18 +8,12 @@
 import Foundation
 import UIKit
 
-protocol WelcomeViewControllerDelegate: AnyObject {
-    func updateCaloricGoal(_ controller: EntryDetailViewController)
-}
-
 class WelcomeViewController: UIViewController, UITextFieldDelegate {
 
     @IBOutlet var imageView: UIImageView!
     @IBOutlet var label: UILabel!
     @IBOutlet var doneButton: UIButton!
     @IBOutlet weak var textField: UITextField!
-    
-    weak var delegate: WelcomeViewControllerDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -109,7 +103,6 @@ class WelcomeViewController: UIViewController, UITextFieldDelegate {
     @IBAction func finished() {
         UserDefaults.standard.integer(forKey: "CaloricGoal")
         UserDefaults.standard.set(textField.text!, forKey: "CaloricGoal")
-        
         Core.shared.setIsNotNewUser()
         dismiss(animated: true)
     }

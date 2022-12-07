@@ -20,7 +20,7 @@ let applicationDocumentsDirectory: URL = {
 
  let dateFormatter: DateFormatter = {
   let formatter = DateFormatter()
-    formatter.dateFormat = "MM/dd HH:mm"
+    formatter.dateFormat = "MM/dd"
   return formatter
 }()
 
