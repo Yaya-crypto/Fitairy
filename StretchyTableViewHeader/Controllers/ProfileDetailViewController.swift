@@ -32,17 +32,15 @@ class ProfileDetailViewController: UITableViewController, UITextFieldDelegate {
     }
     
     /*
-     Disable done button if user hasnt submitted any info
+     When a user finishes typing insert the new caloric goal
      */
-    func textFieldShouldClear(_ textField: UITextField) -> Bool {
-        return true
-    }
-    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if textField.text!.isEmpty {
             return false
         } else {
             UserDefaults.standard.set(textField.text, forKey: "CaloricGoal")
+            tableView.footerView(forSection: 0)?.frame.size.width = tableView.frame.width - 20
+            tableView.footerView(forSection: 0)?.textLabel?.text = "Current Goal: \(textField.text!)"
             textField.text = ""
             return true
         }

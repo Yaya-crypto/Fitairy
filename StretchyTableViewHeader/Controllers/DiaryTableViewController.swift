@@ -8,7 +8,7 @@
 import UIKit
 import CoreData
 
-class DiaryTableViewController: UITableViewController {
+class DiaryTableViewController: UITableViewController, UIPopoverPresentationControllerDelegate {
     var managedObjectContext: NSManagedObjectContext!
     var caloricGoal = UserDefaults.standard.integer(forKey: "CaloricGoal")
     var caloriesConsumed = 0
@@ -71,19 +71,27 @@ class DiaryTableViewController: UITableViewController {
         datePickerOnNavbarTitle()
     }
     
+    /*
+     When the user updates the caloricGoal in the profile tab. Update the labels here
+     */
     override func viewWillAppear(_ animated: Bool) {
-        tableView.reloadData()
+        caloricGoal = UserDefaults.standard.integer(forKey: "CaloricGoal")
+        updateCaloricTotal()
+        headerView.changeCaloriesLabel(caloriesConsumed: caloriesConsumed, caloriesLeft: caloriesLeft, caloricGoal: caloricGoal)
     }
     
     // MARK: Table View Delegates
     
+    /*
+     Cell UI config
+     */
     override func tableView(
       _ tableView: UITableView,
       cellForRowAt indexPath: IndexPath) -> UITableViewCell {
           
       let cell = tableView.dequeueReusableCell(withIdentifier: "FoodEntry", for: indexPath)
 
-          cell.backgroundColor = UIColor().hexStringToUIColor(hex: "ADD8E6")
+      cell.backgroundColor = UIColor().hexStringToUIColor(hex: "ADD8E6")
       let item = fetchedResultsController.object(at: indexPath)
       configureText(for: cell, with: item)
 
@@ -116,6 +124,7 @@ class DiaryTableViewController: UITableViewController {
     
     /*
      Delete an entry in the diary
+     Update core data
      */
     override func tableView(
       _ tableView: UITableView,
@@ -133,6 +142,10 @@ class DiaryTableViewController: UITableViewController {
         }
     }
     
+    /*
+     The headerview is created in viewForHeaderInDiary
+     sticky header with calory labels
+     */
     override func tableView(
         _ tableView: UITableView,
         viewForHeaderInSection section: Int
@@ -149,35 +162,6 @@ class DiaryTableViewController: UITableViewController {
      Red if the User went over the goal
      Green if the User is within the limit
      */
-    func updateCaloricTotal() {
-        caloriesConsumed = 0
-        caloriesLeft = 0
-        
-        fetchedResultsController.fetchedObjects?.forEach {entry in
-            caloriesConsumed += Int(entry.nf_calories)
-        }
-        caloriesLeft = caloricGoal - caloriesConsumed
-
-    }
-    
-    func datePickerOnNavbarTitle() {
-        // Set the mode to the date picker
-        datePicker.datePickerMode = .date
-
-        // Set the navigation bar title to the date picker
-        navigationItem.titleView = datePicker
-
-        // Add a tap gesture recognizer to the navigation bar title
-        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTapNavigationBarTitle))
-        navigationItem.titleView?.addGestureRecognizer(tapGestureRecognizer)
-
-        // Add a target-action for the date picker's value changed event
-        datePicker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
-
-        // Add a tap gesture recognizer to the view. Not working with cell taps
-       // let viewTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTapView))
-        //view.addGestureRecognizer(viewTapGestureRecognizer)
-    }
     
     /*
      Opens a UIDatePicker if the user taps on the title of the controller
@@ -291,8 +275,41 @@ class DiaryTableViewController: UITableViewController {
         }
     }
     
+    func updateCaloricTotal() {
+        caloriesConsumed = 0
+        caloriesLeft = 0
+        
+        fetchedResultsController.fetchedObjects?.forEach {entry in
+            caloriesConsumed += Int(entry.nf_calories)
+        }
+        caloriesLeft = caloricGoal - caloriesConsumed
+
+    }
+    
+    func datePickerOnNavbarTitle() {
+        // Set the mode to the date picker
+        datePicker.datePickerMode = .date
+
+        // Set the navigation bar title to the date picker
+        navigationItem.titleView = datePicker
+
+        // Add a tap gesture recognizer to the navigation bar title
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTapNavigationBarTitle))
+        navigationItem.titleView?.addGestureRecognizer(tapGestureRecognizer)
+
+        // Add a target-action for the date picker's value changed event
+        datePicker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
+
+        // TODO: Figure out why this code disables cell taps
+        // Add a tap gesture recognizer to the view.
+       // let viewTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTapView))
+        //view.addGestureRecognizer(viewTapGestureRecognizer)
+    }
+    
     /*
-     Updates the predicate based on the date the user selected.
+     Updates the predicate based on the date the user selected in datePicker
+     TODO: figure out why this doesnt work when the user selects a differnt date then the current date. The current dates dont load until a new refresh
+     
      */
     func updatePredicate() -> NSPredicate {
         // Get the current calendar with local time zone NSDATEformatter for locale timezone, store in UTC
@@ -385,12 +402,16 @@ extension DiaryTableViewController: EntryDetailViewControllerDelegate {
     }
     
     
-    // Disable done button
+    /*
+     Has no function
+     */
     func addItemViewController<T>(_ controller: EntryDetailViewController, didFinishAdding obj: T) {
         print("")
     }
     
-    
+    /*
+     Return to previous nav screen
+     */
     func addItemViewControllerDidCancel(_ controller: EntryDetailViewController) {
         navigationController?.popViewController(animated: true)
     }

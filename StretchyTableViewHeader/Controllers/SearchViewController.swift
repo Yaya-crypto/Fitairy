@@ -37,6 +37,7 @@ class SearchViewController: UIViewController {
         searchBar.barTintColor = UIColor().hexStringToUIColor(hex: "CAE9F5")
         searchBar.searchTextField.backgroundColor = UIColor().hexStringToUIColor(hex: "F0F8FF")
         tableView.backgroundColor = UIColor().hexStringToUIColor(hex: "AFDCEB")
+        
         // Sets the BookmarkIcon to a Barcode scanning icon
         searchBar.setImage(UIImage(systemName: "barcode.viewfinder"), for: .bookmark, state: .normal)
         
@@ -53,7 +54,7 @@ class SearchViewController: UIViewController {
         tableView.contentInset = UIEdgeInsets(top: 51, left: 0, bottom: 0, right: 0)
         
         // Keyboard popup on launch
-         searchBar.becomeFirstResponder()
+        searchBar.becomeFirstResponder()
         dismissKeyboard()
     }
     
@@ -142,7 +143,9 @@ class SearchViewController: UIViewController {
        return request
         
     }
-    
+    /*
+     If the user taps outside the search box the keyboard closes
+     */
     func dismissKeyboard() {
            let tap: UITapGestureRecognizer = UITapGestureRecognizer( target:     self, action:    #selector(dismissKeyboardTouchOutside))
            tap.cancelsTouchesInView = false
@@ -224,7 +227,7 @@ extension SearchViewController: UISearchBarDelegate {
     
     /*
      If the user tapped the barcode icon.
-     TODO: Implement barcode scanning with another API
+     TODO: Implement barcode scanning with another API. This would open the camera and upon succes redirect to the EntryDetailPage
      */
     func searchBarBookmarkButtonClicked(_ searchBar: UISearchBar) {
     }
@@ -325,11 +328,16 @@ extension SearchViewController: EntryDetailViewControllerDelegate {
         }
     }
     
-    
+    /*
+     Navigate to previous screen
+     */
     func addItemViewControllerDidCancel(_ controller: EntryDetailViewController) {
         navigationController?.popViewController(animated: true)
     }
     
+    /*
+     Adds an entry to Core Data
+     */
     func addItemViewController<T>(_ controller: EntryDetailViewController, didFinishAdding obj: T) {
         guard let mainView = navigationController?.parent?.view else { return }
         let hudView = HudView.hud(inView: mainView, animated: true)
