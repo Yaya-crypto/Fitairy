@@ -24,18 +24,18 @@ class SearchViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     
     
-    var hasSearched = false
-    var foodResult = FoodEntry(foods: [])
-    var dataTask: URLSessionDataTask?
+   // var hasSearched = false
+    //var foodResult = FoodEntry(foods: [])
+  //  var dataTask: URLSessionDataTask?
     var managedObjectContext: NSManagedObjectContext!
-    
+    private let search = Search()
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor().hexStringToUIColor(hex: "AFDCEB")
         searchBar.barTintColor = UIColor().hexStringToUIColor(hex: "CAE9F5")
-        searchBar.searchTextField.backgroundColor = UIColor().hexStringToUIColor(hex: "F0F8FF")
+        //searchBar.searchTextField.backgroundColor = UIColor().hexStringToUIColor(hex: "F0F8FF")
         tableView.backgroundColor = UIColor().hexStringToUIColor(hex: "AFDCEB")
         
         // Sets the BookmarkIcon to a Barcode scanning icon
@@ -78,22 +78,6 @@ class SearchViewController: UIViewController {
     // MARK: - Helper Methods
     
     /*
-     Parse the results from /vs/natural/nutrients API to a FoodEntry
-     */
-    func parseJSON(data: Data) -> FoodEntry? {
-        
-        var returnValue: FoodEntry?
-        
-        do {
-            returnValue = try JSONDecoder().decode(FoodEntry.self, from: data)
-        } catch {
-            print("Error took place\(error.localizedDescription).")
-        }
-        
-        return returnValue
-    }
-    
-    /*
      Delay in showing the animation and returning back to searchController
      */
     func afterDelay(_ seconds: Double, run: @escaping () -> Void) {
@@ -108,41 +92,16 @@ class SearchViewController: UIViewController {
     func convert(foodEntry food: FoodEntry.food, toDiary entry: DiaryEntry) -> DiaryEntry {
         entry.food_name = food.food_name
         entry.nf_calories = food.nf_calories
-        entry.nf_protein = food.nf_protein!
-        entry.nf_total_carbohydrate = food.nf_total_carbohydrate!
-        entry.nf_sugars = food.nf_sugars!
+        entry.nf_protein = food.nf_protein.get(or: 0)
+        entry.nf_total_carbohydrate = food.nf_total_carbohydrate.get(or: 0)
+        entry.nf_sugars = food.nf_sugars.get(or: 0)
         entry.serving_qty = Int32(food.serving_qty)
         entry.serving_weight_grams = Int32(food.serving_weight_grams)
-        entry.nf_total_fat = food.nf_total_fat!
+        entry.nf_total_fat = food.nf_total_fat.get(or: 0)
         entry.dateLogged = Date()
         return entry
     }
     
-    /*
-     Required Headers
-     Body is user input (e.g "One cup on orange juice")
-     */
-    func performAPI(searchText: String) -> NSMutableURLRequest {
-        let headers = [
-            "x-app-id": "6aed71f3",
-            "x-app-key": "7a0d942304579d189e44f433f28c8c0d",
-            "x-remote-user-id": "0"
-        ]
-        
-        let body: [String: String] = ["query": searchText]
-        let finalBody = try! JSONSerialization.data(withJSONObject: body)
-        let request = NSMutableURLRequest(url: NSURL(string: "https://trackapi.nutritionix.com/v2/natural/nutrients")! as URL,
-                                                cachePolicy: .useProtocolCachePolicy,
-                                            timeoutInterval: 10.0)
-        
-        request.httpMethod = "POST"
-        request.allHTTPHeaderFields = headers
-        request.httpBody = finalBody
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-       return request
-        
-    }
     /*
      If the user taps outside the search box the keyboard closes
      */
@@ -162,11 +121,14 @@ class SearchViewController: UIViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
         if segue.identifier == "foodItem" {
-            let controller = segue.destination as! EntryDetailViewController
-            let indexPath = sender as! IndexPath
-            let foodDetail = foodResult.foods[indexPath.row]
-            controller.foodEntryToAdd = foodDetail
-            controller.delegate = self
+            if case .results(let list) = search.state {
+                let controller = segue.destination as! EntryDetailViewController
+                let indexPath = sender as! IndexPath
+                let foodDetail = list.foods[indexPath.row]
+                controller.foodEntryToAdd = foodDetail
+                controller.delegate = self
+            }
+
         }
     }
     
@@ -180,49 +142,21 @@ extension SearchViewController: UISearchBarDelegate {
      User performs a search for a food
      */
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        if !searchBar.text!.isEmpty {
-          searchBar.resignFirstResponder() // remove keyboard
-            dataTask?.cancel()
-            tableView.reloadData()
-            hasSearched = true
-            
-            let request = performAPI(searchText: searchBar.text!)
-            
-            let session = URLSession.shared
-            
-            dataTask = session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -> Void in
-                if let error = error  {
-                    print("Error performing API \(error.localizedDescription)")
-                    
-                } else if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
-                    
-                    if let data = data, (String(data: data, encoding: .utf8) != nil) {
-                        
-                        let todoItem = self.parseJSON(data: data)
-                        guard let todoItemModel = todoItem else { return }
-                        
-                        self.foodResult = todoItemModel
-                        DispatchQueue.main.async {
-                          self.tableView.reloadData()
-                        }
-                        return
-                    }
-                } else {
-                    print(response!)
-                }
-                
-                DispatchQueue.main.async {
-                 // self.hasSearched = false
-                  self.tableView.reloadData()
-                }
-                
-            })
-
-          dataTask?.resume()
-
+        performSearch()
+    }
+    
+    func performSearch() {
+        search.performSearch(for: searchBar.text!) { success in
+            if !success {
+                print("Error")
+                print("This?")
+                print(self.search.state)
+            }
+            self.tableView.reloadData()
         }
-
-       
+        
+        tableView.reloadData()
+        searchBar.resignFirstResponder()
     }
     
     /*
@@ -238,7 +172,6 @@ extension SearchViewController: UISearchBarDelegate {
     func position(for bar: UIBarPositioning) -> UIBarPosition {
      return .topAttached
    }
-    
 }
 
 extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
@@ -251,13 +184,14 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(
       _ tableView: UITableView,
       numberOfRowsInSection section: Int) -> Int {
-      if !hasSearched {
-        return 0
-      } else if foodResult.foods.count == 0 {
-        return 1
-      } else {
-          return foodResult.foods.count
-      }
+          switch search.state {
+          case .notSearchedYet:
+              return 0
+          case .noResults:
+              return 1
+          case .results(let list):
+              return list.foods.count
+          }
     }
     
     /*
@@ -267,21 +201,22 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(
       _ tableView: UITableView,
       cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-
-        if foodResult.foods.count == 0 {
-            return tableView.dequeueReusableCell(withIdentifier: TableView.CellIdentifiers.nothingFoundCell, for: indexPath)
-        } else {
-            let cell = tableView.dequeueReusableCell(withIdentifier:
-              TableView.CellIdentifiers.searchResultCell, for: indexPath) as! SearchResultCell
-            
-            let searchResult = foodResult.foods[indexPath.row]
-            cell.foodname.text = searchResult.food_name.capitalized
-            cell.foodMacros.text = "Calories: \(searchResult.nf_calories) Fat: \(searchResult.nf_total_fat.get(or: 0)) Protein: \(searchResult.nf_protein.get(or: 0))"
-            return cell
-        }
-       
-        
-    }
+          switch search.state {
+          case .notSearchedYet:
+              fatalError("Nothing to do")
+              
+          case .noResults:
+              return tableView.dequeueReusableCell(withIdentifier: TableView.CellIdentifiers.nothingFoundCell, for: indexPath)
+              
+          case .results(let list):
+              let cell = tableView.dequeueReusableCell(withIdentifier: TableView.CellIdentifiers.searchResultCell, for: indexPath) as! SearchResultCell
+              
+              let searchResults = list.foods[indexPath.row]
+              cell.foodname.text = searchResults.food_name.capitalized
+              cell.foodMacros.text = "Calories: \(searchResults.nf_calories) Fat: \(searchResults.nf_total_fat.get(or: 0)) Protein: \(searchResults.nf_protein.get(or: 0))"
+              return cell
+          }
+      }
     
     /*
      De-selects the row a user tapped. Makes it not grey
@@ -299,12 +234,12 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(
       _ tableView: UITableView,
       willSelectRowAt indexPath: IndexPath ) -> IndexPath? {
-          
-        if foodResult.foods.count == 0 {
-        return nil
-      } else {
-        return indexPath
-      }
+          switch search.state {
+          case .notSearchedYet, .noResults:
+              return nil
+          case .results:
+              return indexPath
+          }
     }
 }
 
